@@ -1,6 +1,6 @@
 # ExamGadh – Requirements
 
-Status: DRAFT v0.1 for user confirmation · Date: 2026-10-27 · Step 1 of the SDLC pipeline
+Status: v0.2 – OQ-001, OQ-003, OQ-006, OQ-008 resolved by user on 2026-10-27; remaining open questions below · Date: 2026-10-27 · Step 1 of the SDLC pipeline
 
 Source tags: `[brief]` store listing text · `[sketch]` hand sketch (`inputs/sketch-test-ca-notes.jpg`) ·
 `[notebook]` notebook page dated 5 Sep 2026 (`inputs/notebook-5sep2026.jpg`) · `[logo]` ·
@@ -45,7 +45,7 @@ Priority: MUST / SHOULD / COULD. Phase: MVP = first release `[answer]`, P2 = aft
 |---|---|---|---|---|
 | FR-001 | Sign in with Google | MUST | MVP | [notebook][answer] |
 | FR-002 | Phone number captured on the account profile (notebook says "Google login + phone no"); whether it is verified by OTP is OQ-002 | MUST | MVP | [notebook] |
-| FR-003 | **One user active on one device at a time**: operators can see and monitor concurrent usage, and a second simultaneous login is blocked or forces the first session out | MUST | MVP | [answer] |
+| FR-003 | **One user active on one device at a time**: operators can see and monitor concurrent usage. Newest login wins and ends the older session; web and app count as one session (OQ-003, confirmed) | MUST | MVP | [answer] |
 | FR-004 | Profile with avatar (16 stock avatars exist), name, district (33 CG districts), target exam | SHOULD | MVP | [apk-user] avatars, districts |
 | FR-005 | Hindi/English language toggle on all content and UI | MUST | MVP | [brief][apk-user] |
 | FR-006 | Data export for the user ("me/export") | COULD | P2 | [apk-user] `/v1/me/export` |
@@ -112,7 +112,7 @@ Priority: MUST / SHOULD / COULD. Phase: MVP = first release `[answer]`, P2 = aft
 | ID | Requirement | Pri | Phase | Source |
 |---|---|---|---|---|
 | FR-080 | Subscription plans by duration (3/6/12 months), per exam or all, with trial days; sample prices Rs 399–1499 | MUST | MVP | [apk-user] plans |
-| FR-081 | Razorpay as payment gateway. User wording: "razorpay would also be there but inside the in app purchase as payment gateway"; exact flow is OQ-001 | MUST | MVP | [answer] |
+| FR-081 | **Razorpay is the only payment gateway** (docs: https://razorpay.com/docs/home). No Google Play Billing; no other gateway (OQ-001, confirmed). Server-side order creation, signature verification and webhooks; works on web and Android | MUST | MVP | [answer] |
 | FR-082 | Coupon codes (plan + days) | SHOULD | MVP | [apk-user] `/v1/coupons/redeem` |
 | FR-083 | Entitlements synced to the client; offline licence validity (30 days) for downloaded content | SHOULD | MVP (inferred) | [apk-user] settings |
 | FR-084 | Push notifications and reminders with quiet hours (22:00–07:00) and a cap of 2 nudges/day | SHOULD | MVP | [apk-user] settings, `POST_NOTIFICATIONS`, `ReminderReceiver` |
@@ -120,7 +120,7 @@ Priority: MUST / SHOULD / COULD. Phase: MVP = first release `[answer]`, P2 = aft
 ### 4.10 Admin panel (web)
 | ID | Requirement | Pri | Phase | Source |
 |---|---|---|---|---|
-| FR-090 | CRUD for exams, topics, subjects, syllabi, notes, questions (single and bulk import via template, preview then commit), tests, test sections, plans, coupons, FAQs, updates, calendar, avatars, app texts | MUST | MVP | [apk-admin] `/r/*`, `/import/*` |
+| FR-090 | CRUD for exams, topics, subjects, syllabi, notes, questions (the admin pushes questions into the DB via single entry or bulk import: download template, upload, preview with validation, then commit; confirmed as the model to reproduce), tests, test sections, plans, coupons, FAQs, updates, calendar, avatars, app texts | MUST | MVP | [apk-admin] `/r/*`, `/import/*` |
 | FR-091 | Question workflow: draft → approved → published, schedule (`publish_after`), checklist, versions, bulk status change, machine-translation flag | MUST | MVP | [apk-admin] question fields |
 | FR-092 | Access-control matrix for free/paid per test/series/subject | MUST | MVP | [apk-admin] `/access` |
 | FR-093 | User directory with per-user activity, attempts, doubts, entitlements | MUST | MVP | [apk-admin] `/users` |
@@ -134,7 +134,7 @@ Priority: MUST / SHOULD / COULD. Phase: MVP = first release `[answer]`, P2 = aft
 |---|---|---|
 | NFR-001 | Bilingual (Hindi/English) content with proper Devanagari rendering; Krutidev legacy font conversion needed for imported PDFs/docs | [brief][apk-admin] `krutidev010.map` |
 | NFR-002 | Cost-conscious infrastructure: "server cost" is a stated concern; team of 2 | [notebook] |
-| NFR-003 | Launch aligned with Diwali (notebook header) — date and year unconfirmed, see OQ-008 | [notebook] |
+| NFR-003 | First launch target is Diwali 2026 (8 Nov 2026), confirmed by user; 12 days after this document, so MVP scope must be cut to what fits (see Section 14) | [notebook][answer] |
 | NFR-004 | Single-active-session enforcement and tamper-resistant tests (integrity log, server time `/v1/time`) | [answer][apk-user] |
 | NFR-005 | Live tests and battles need low-latency realtime for synchronous start and ranking | [notebook] (inferred) |
 | NFR-006 | Peak concurrency at live tests / exam days must be sized in architecture step (no figures given) | (inferred) |
@@ -149,19 +149,16 @@ Priority: MUST / SHOULD / COULD. Phase: MVP = first release `[answer]`, P2 = aft
 | Integration | Use | Source |
 |---|---|---|
 | Google Sign-In | Student auth | [answer] |
-| Razorpay | Paid plans | [answer] |
-| Google Play Billing | Existing app verifies Play purchases; whether to keep it alongside Razorpay is OQ-001 | [apk-user] `/v1/billing/play/verify` |
+| Razorpay | Only payment gateway for paid plans (confirmed) | [answer] |
 | Push (FCM, inferred) | Notifications | [apk-user] |
 | Google Cloud Translation | Admin machine translation EN↔HI | [apk-admin] |
 | LLM (Claude / Gemini) | Optional admin AI assist for CA summaries and answer evaluation | [apk-admin] `api.anthropic.com`, `generativelanguage.googleapis.com` |
 | OCR (Tesseract eng + hin) | Admin extraction of questions from scanned PDFs/images | [apk-admin] `tessdata` |
 | Content portals | CG DPR, DES, finance, PIB, The Hindu, Drishti etc. for CA collection | [apk-admin] `portals.json` |
-| Google Play service account | Play purchase verification | [apk-admin] settings |
 
 ## 7. Exams and content taxonomy
 
-Exams in prototype: CGPSC State Service (Prelims, has Mains), Police Sub-Inspector (SI), Patwari, Mandi/food inspector,
-Food, Other `[apk-user]`. Brief lists a wider set (Forest Service ACF/Ranger, Assistant Professor, Hostel Warden, RI, ADEO, Labour
+**Launch catalogue (confirmed): the 6 exams in the prototype** – CGPSC State Service (Prelims, has Mains), Police Sub-Inspector (SI), Patwari, Mandi, Food, Other `[apk-user][answer]`. The brief lists a wider set for later (Forest Service ACF/Ranger, Assistant Professor, Hostel Warden, RI, ADEO, Labour
 Inspector, Rural Agriculture Officer, Platoon Commander) `[brief]`.
 Subjects (17): History, Geography, Polity, Economy, Science, Environment, Culture, CG GK, Agriculture, Food, Computer, English,
 Hindi, Maths, Reasoning, Aptitude, Current Affairs `[apk-user]`. 42 topics, 12 notes, ~104 sample questions, 41 sample tests exist as demo data.
@@ -188,14 +185,15 @@ Hierarchy: Exam → Test series section → Test → Section → Question; Subje
 
 | ID | Question | Why it matters | Proposed default |
 |---|---|---|---|
-| OQ-001 | Razorpay "inside the in-app purchase": does this mean Razorpay checkout opened inside the app (webview/SDK), or Google Play Billing with Razorpay on web only? | Google Play policy requires Play Billing for digital content consumed in-app; wrong choice risks store rejection and fees | Razorpay on web + Android app, with Play Billing added if Play review demands it |
+| ~~OQ-001~~ | RESOLVED: Razorpay is the only gateway, nothing else. | – | – |
+| OQ-001a | Google Play policy may require Play Billing for in-app digital content; user chose Razorpay only. Accept the store-review risk? | Play rejection risk | Proceed with Razorpay; consider distributing the APK via web/direct if Play rejects |
 | OQ-002 | Is phone number verified by OTP (SMS cost) or only collected? | SMS cost, DLT registration, fraud | Collect and verify once via OTP at first login |
-| OQ-003 | Single-device rule: block the new login or log out the old one? Limit per account (1)? Allow web and app simultaneously? | UX and support load | Newest login wins; old session ends; web and app count as one |
+| ~~OQ-003~~ | RESOLVED: newest login wins, old session ends, web and app count as one. | – | – |
 | OQ-004 | Live test volumes: number of concurrent students at peak? Free vs paid? | Drives realtime and DB sizing | Ask in architecture step |
-| OQ-005 | What does "Diwali" in the notebook mean: target launch date or festive offer? | Deadline | Treat as launch target and confirm date |
-| OQ-006 | Which exams are in the launch catalogue (prototype has 6, brief lists more)? | Content workload | CGPSC SSE Prelims, SI, Patwari first |
+| ~~OQ-005~~ | RESOLVED: Diwali is the first launch target. | – | – |
+| ~~OQ-006~~ | RESOLVED: all 6 prototype exams launch (CGPSC, SI, Patwari, Mandi, Food, Other). The wider list in the brief comes later. | – | – |
 | OQ-007 | PYQ and portal-sourced CA: licence/permission to republish? | Legal | Own-written summaries only, link out to sources |
-| OQ-008 | Is "5 Sep 2026" the current date of the notebook note and Diwali 2026 the target? Today is 27 Oct 2026, after Diwali 2026 (8 Nov 2026 is Diwali; confirm) | Timeline | Confirm |
+| OQ-008 | RESOLVED that Diwali is the target. Open: Diwali 2026 is 8 Nov, 12 days from now. Is that the real date, or Diwali 2027? | Decides whether the MVP must be heavily cut | Ask in architecture/build planning |
 | OQ-009 | Admin roles: owner, editor, teacher, read-only? | Permission model | Those four |
 | OQ-010 | Is AI answer evaluation / AI assist wanted at all (prototype has an optional toggle, currently off)? | Cost and policy | Out of MVP |
 | OQ-011 | Data from existing prototype users (40 demo users) - migrate? | Migration effort | No, clean start |
@@ -214,6 +212,6 @@ Doubt – a student question answered by a teacher · Mentor – study planner �
 
 ## 14. Hand-off to architecture
 - **Scale hints:** none given. Prototype has 40 demo users. Architecture must ask: monthly active users, peak concurrent users on live tests / battles, content size, monthly budget.
-- **Hardest requirements:** FR-003 (one active user), FR-017/FR-050 (live tests and battles with realtime sync), FR-081 (payments under Play policy), FR-013 (question-bank personalisation), NFR-002 (low server cost).
+- **Hardest requirements:** FR-003 (one active user), FR-017/FR-050 (live tests and battles with realtime sync), FR-081 (Razorpay only, Play policy risk OQ-001a), the 12-day Diwali target (OQ-008), FR-013 (question-bank personalisation), NFR-002 (low server cost).
 - **Questions architecture must still ask:** traffic, MAU, budget (INR/month), hosting region, DB preference, notification channel, SMS provider, CDN for media/PDFs.
 - **Reuse candidates from the prototype API:** `/v1/*` endpoints (auth, content sync, attempts, battle, doubts, mentor, answers, leaderboard, billing, coupons) can serve as a contract reference, not a mandate.
