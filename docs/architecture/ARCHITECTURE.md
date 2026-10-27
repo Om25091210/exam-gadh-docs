@@ -183,7 +183,7 @@ Outline of main tables (names are provisional):
 
 ## 6. CI/CD and environments
 
-- Repos: `exam-gadh-frontend`, `exam-gadh-backend` (includes `infra/` Terraform), `exam-gadh-docs`.
+- Repos: `exam-gadh-frontend`, `exam-gadh-backend`, `exam-gadh-terraform` (see amendment A1), `exam-gadh-docs`.
 - Workflows (GitHub Actions):
   - **PR:** lint, typecheck, unit tests, `terraform fmt/validate`, dependency and secret scan.
   - **Merge to `main` → dev:** build images (arm64), push to ECR, run DB migrations, deploy via SSM, smoke test.
@@ -280,4 +280,12 @@ Client name: ______________________________  Date: ____________________
 
 Signature: ________________________________
 
-*(Do not create `APPROVAL.md` until the client has signed; step 3 stays locked until then.)*
+*(`APPROVAL.md` was created on 2026-10-27 after the client signed v0.1.)*
+
+## Amendments (after approval)
+
+| # | Date | Amendment | Reason | Flagged to |
+|---|---|---|---|---|
+| A1 | 2026-10-27 | Terraform lives in its own repo, `exam-gadh-terraform` (modules, `envs/dev`, later `envs/prod`, infra CI workflows with OIDC). The backend repo no longer contains `infra/`. Architecture and cost are unchanged. | Project owner's instruction when approving the build layout | Project owner (in session); client to be told at next review |
+
+Repos are now: `exam-gadh-frontend`, `exam-gadh-backend`, `exam-gadh-terraform`, `exam-gadh-docs`. §6 and §5.1 references to `infra/` in the backend repo should be read as the Terraform repo.
