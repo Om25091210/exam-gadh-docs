@@ -1,6 +1,6 @@
 # ExamGadh – Requirements
 
-Status: v0.2 – OQ-001, OQ-003, OQ-006, OQ-008 resolved by user on 2026-10-27; remaining open questions below · Date: 2026-10-27 · Step 1 of the SDLC pipeline
+Status: v0.3 (phone number dropped from launch scope 2026-10-27) – OQ-001, OQ-003, OQ-006, OQ-008 resolved by user on 2026-10-27; remaining open questions below · Date: 2026-10-27 · Step 1 of the SDLC pipeline
 
 Source tags: `[brief]` store listing text · `[sketch]` hand sketch (`inputs/sketch-test-ca-notes.jpg`) ·
 `[notebook]` notebook page dated 5 Sep 2026 (`inputs/notebook-5sep2026.jpg`) · `[logo]` ·
@@ -44,7 +44,7 @@ Priority: MUST / SHOULD / COULD. Phase: MVP = first release `[answer]`, P2 = aft
 | ID | Requirement | Pri | Phase | Source |
 |---|---|---|---|---|
 | FR-001 | Sign in with Google | MUST | MVP | [notebook][answer] |
-| FR-002 | Phone number captured on the account profile (notebook says "Google login + phone no"); whether it is verified by OTP is OQ-002 | MUST | MVP | [notebook] |
+| FR-002 | Phone number login/capture: **deferred by user** ("remove phone number login initially, will prompt later to add"). Launch has Google sign-in only; the data model keeps a nullable phone field so it can be added later without migration pain | WON'T (now) | P2 | [notebook][answer] |
 | FR-003 | **One user active on one device at a time**: operators can see and monitor concurrent usage. Newest login wins and ends the older session; web and app count as one session (OQ-003, confirmed) | MUST | MVP | [answer] |
 | FR-004 | Profile with avatar (16 stock avatars exist), name, district (33 CG districts), target exam | SHOULD | MVP | [apk-user] avatars, districts |
 | FR-005 | Hindi/English language toggle on all content and UI | MUST | MVP | [brief][apk-user] |
@@ -187,7 +187,7 @@ Hierarchy: Exam → Test series section → Test → Section → Question; Subje
 |---|---|---|---|
 | ~~OQ-001~~ | RESOLVED: Razorpay is the only gateway, nothing else. | – | – |
 | OQ-001a | Google Play policy may require Play Billing for in-app digital content; user chose Razorpay only. Accept the store-review risk? | Play rejection risk | Proceed with Razorpay; consider distributing the APK via web/direct if Play rejects |
-| OQ-002 | Is phone number verified by OTP (SMS cost) or only collected? | SMS cost, DLT registration, fraud | Collect and verify once via OTP at first login |
+| ~~OQ-002~~ | RESOLVED: no phone number at launch; user will request it later. | – | – |
 | ~~OQ-003~~ | RESOLVED: newest login wins, old session ends, web and app count as one. | – | – |
 | OQ-004 | Live test volumes: number of concurrent students at peak? Free vs paid? | Drives realtime and DB sizing | Ask in architecture step |
 | ~~OQ-005~~ | RESOLVED: Diwali is the first launch target. | – | – |
