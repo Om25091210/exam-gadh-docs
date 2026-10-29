@@ -11,3 +11,4 @@
 | BL-7 | **Real content** (questions, notes, PYQs) | Owner/content team | Only SAMPLE content exists | Bulk import + template ready |
 | BL-8 | **Google Play policy** with Razorpay-only (OQ-001a) | Owner decision | Possible store rejection | Web purchase + direct APK |
 | BL-9 | Graviton (`t4g`) vCPU quota and CloudFront account verification in the new AWS account are unknown until apply | AWS | Apply may stop on one resource | Fails cleanly, re-run |
+| BL-10 | **GST / invoice format**: invoice numbers exist, but the legal entity, GSTIN, HSN/SAC code and tax rate are unknown | Owner / accountant | Receipts show amount and number only, not a tax invoice | Receipt API is ready to extend; do not market as a GST invoice |

@@ -18,7 +18,7 @@ Admins are not Google users; the prototype admin used TOTP. Password hashing: No
 
 **D-007 · Tests are versioned.** Publishing freezes a `TestVersion` with a snapshot of every question (body + answer key). Attempts bind to a version. Editing a published test creates a new draft version; old attempts keep their snapshot. Answer-key corrections go through an explicit "regrade version" admin action that is audit-logged.
 
-**D-008 · Server-side auto-submit uses a BullMQ delayed job per attempt plus a periodic sweeper** (belt and braces), so expiry works with the client gone. Requires Redis (already in the signed architecture); local dev and tests use an in-process fallback.
+**D-008 · Server-side auto-submit is a periodic sweeper (every 15 s) over running attempts past deadline + 15 s grace.** Finalising is idempotent (row lock + one `AttemptResult` per attempt), so several instances may sweep at once and a lost run costs only a delay. *Changed 2026-10-29 from "BullMQ delayed job per attempt":* at the signed scale (small, single server) a queue adds Redis and a failure mode without improving correctness. Redis arrives with realtime (live lobby, battle) and the sweeper can then be replaced by delayed jobs without changing `finalize`.
 
 **D-009 · Rank/percentile are computed on read** from `AttemptResult` with an index, not stored, for ranked first attempts only. Practice reattempts are never ranked.
 
@@ -27,3 +27,13 @@ Admins are not Google users; the prototype admin used TOTP. Password hashing: No
 **D-011 · Suspension takes effect on the next request** by clearing the in-process session cache on suspend (single instance) and re-reading user status on cache miss. Multi-instance caveat documented; revisit with Redis.
 
 **D-012 · Mobile.** Until the web apps are complete, the student web app is a PWA that works on mid-range Android. The React Native app is built afterwards on `packages/api` and is tracked separately in the checklist.
+
+**D-013 · Notifications are an in-app inbox only for now.** One service (`NotificationsService.notify`) writes bilingual notifications from admin-editable templates, de-duplicated per (student, key), so periodic jobs may run twice or on two servers. Reminders (live test, plan expiry, announcements) count against the daily cap (default 2); answers to the student's own actions (doubt answered, result ready, plan ready) never do. Push, email and SMS are blocked on provider choice (BL-4); quiet hours (22:00–07:00) apply when push exists. Jobs run in-process every minute (disabled in tests).
+
+**D-014 · Doubts desk rules.** Quota is 3 a day for everyone and 2 a month for students without an active plan (both settings). SLA is 48 h from asking; a follow-up on an answered doubt reopens it and restarts the SLA. Attachments are uploaded straight to private S3 under `doubts/<studentId>/`; the API refuses keys outside the student's own folder and serves them by 10-minute links. Operator "away" mode (FR-096, COULD) is not built.
+
+**D-015 · Study plans are rule-based drafts that a mentor must send.** The generator (`study-plan.ts`) is deterministic: weakest topics first from the student's answers, last ~20% of the time for revision and mocks, Saturday mock, Sunday rest, never more than the hours the student gave. The student sees nothing until a teacher/admin reviews, edits and sends it. No AI is used; none is claimed.
+
+**D-016 · Analytics advice is rule-based and says when it has too little data.** With fewer than 20 answered questions the only advice is to take a diagnostic test; topics need 5 answers before they are judged.
+
+**D-017 · Account deletion erases personal data but keeps orders and invoices** (tax record-keeping) and test results as anonymous history. The same Google account can sign up again as a new student.
